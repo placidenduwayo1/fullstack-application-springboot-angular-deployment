@@ -1,0 +1,142 @@
+version: '3.4'
+
+services:
+
+  microservices-db:
+    image: mysql:8.0
+    container_name: microservices-db
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - microservices-network
+    environment:
+      MYSQL_ROOT_PASSWORD: pwd
+      #for not be lost after restarting containers all data are saved on volume:/var/lib/mysql
+    volumes:
+      - services-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-uroot", "-ppwd"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    
+  microservices-config-service:
+    image: microservices-config-service:latest
+    container_name: microservices-config-service
+    ports:
+      - 8280:8280
+    networks:
+      - microservices-network
+    build: 
+      context: ../backend-frontend-app/spring-project-back/microservices-config-service
+      dockerfile: Dockerfile
+    healthcheck:
+      test: ["CMD", "curl", "-I", "http://microservices-config-service:8280"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+  
+  microservices-registration-service:
+    image: microservices-registration-service:latest
+    container_name: microservices-registration-service
+    build: 
+      context: ../backend-frontend-app/spring-project-back/microservices-registration-service
+      dockerfile: Dockerfile
+    ports:
+      - 8761:8761
+    networks:
+      - microservices-network
+    depends_on:
+      microservices-config-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-I", "http://microservices-registration-service:8761"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 40s
+
+  backend-frontend-gateway-service:
+    image: backend-frontend-gateway-service:latest
+    container_name: backend-frontend-gateway-service
+    ports:
+      - "8281:8281"
+    build: 
+      context: ../backend-frontend-app/spring-project-back/backend-frontend-gateway-service
+      dockerfile: Dockerfile
+    depends_on:
+      microservices-registration-service:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  clean-archi-business-service-address:
+    image: clean-archi-business-service-address:latest
+    container_name: clean-archi-business-service-address
+    build:
+      context: ..//backend-frontend-app/spring-project-back/clean-archi-business-service-address
+      dockerfile: Dockerfile
+    ports:
+      - 8282:8282
+    depends_on:
+      microservices-db:
+        condition: service_healthy
+      microservices-registration-service:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    
+  clean-archi-business-service-company:
+    image: clean-archi-business-service-company:latest
+    container_name: clean-archi-business-service-company
+    build: 
+      context: ../backend-frontend-app/spring-project-back/clean-archi-business-service-company
+      dockerfile: Dockerfile
+    ports:
+      - 8284:8284
+    depends_on:
+      microservices-db:
+        condition: service_healthy
+      microservices-registration-service:
+        condition: service_healthy
+    networks:
+      - microservices-network
+  
+  clean-archi-business-service-employee:
+    image: clean-archi-business-service-employee:latest
+    container_name: clean-archi-business-service-employee
+    build: 
+      context: ../backend-frontend-app/spring-project-back/clean-archi-business-service-employee
+      dockerfile: Dockerfile
+    ports:
+      - 8283:8283
+    depends_on:
+      microservices-db:
+        condition: service_healthy
+      microservices-registration-service:
+        condition: service_healthy
+    networks:
+      - microservices-network
+  
+  clean-archi-business-service-project:
+    image: clean-archi-business-service-project:latest
+    container_name: clean-archi-business-service-project
+    build: 
+      context: ../backend-frontend-app/spring-project-back/clean-archi-business-service-project
+      dockerfile: Dockerfile
+    ports:
+      - 8285:8285
+    depends_on:
+      microservices-db:
+        condition: service_healthy
+      microservices-registration-service:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+volumes:
+  services-db:
