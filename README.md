@@ -11,7 +11,7 @@ This git is containing a **docker-compose.yml** file for deploying in docker ima
 	* a microservice of managing employees's addresses: ***clean-archi-business-service-address***
 	* a microservice of managing employees: ***clean-archi-business-service-employee***
 	* a microservice of managing projects: ***clean-archi-business-service-project***
-	* a microservice of managing companies: ***addressesclean-archi-business-service-company***
+	* a microservice of managing companies: ***clean-archi-business-service-company***
 
 The backend(a spring boot microservices-base application) and the frontend (angular application) are located on the following git:
 - [spring-project-back and angular-project-front](https://gitea.natan.fr/placidenduwayo/fullstack-application-springboot-angular.git)
