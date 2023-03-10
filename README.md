@@ -18,4 +18,4 @@ The backend(a spring boot microservices-base application) and the frontend (angu
 
 ## Microservices configuration server
 All services (utility services and business services) configiration files for config server are located on the following git:
-- [services configuration files] (https://gitea.natan.fr/placidenduwayo/fullstack-application-springboot-angular-config-service.git)
+- [services configuration files](https://gitea.natan.fr/placidenduwayo/fullstack-application-springboot-angular-config-service.git)
